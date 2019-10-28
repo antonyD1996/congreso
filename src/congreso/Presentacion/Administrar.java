@@ -108,8 +108,15 @@ public class Administrar extends javax.swing.JFrame {
                         }
                     }
                     if (!lista.isEmpty()) {
-
-                        ei.guardarVarios.accept(lista);
+                        List<EstudianteCongreso> resultado=ei.guardarVarios.apply(lista);
+                        
+                        if(!resultado.isEmpty()){
+                            JOptionPane.showMessageDialog(null, "Mientras se realizaban las importanciones se encontraron registros repetidos");
+                            RegistrosOmitidos dialog = new RegistrosOmitidos(resultado,new java.awt.Frame(), true);
+                            dialog.setLocationRelativeTo(null);
+                            dialog.setVisible(true);
+                        }
+                        
                         mostrarEstudiantes.accept(tblEstudiantes);
                     } else {
                         JOptionPane.showMessageDialog(null, "No hay datos para procesar");

@@ -7,6 +7,7 @@ package congreso.Presentacion;
 
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -29,6 +30,8 @@ public class Importar extends java.awt.Dialog {
         btnSeleccionar.addActionListener(l->{
         
             JFileChooser fileChooser = new JFileChooser();
+            FileNameExtensionFilter filtro = new FileNameExtensionFilter("xls", "XLS", "xlsx", "XLSX");
+            fileChooser.setFileFilter(filtro);
             int returnValue = fileChooser.showOpenDialog(null);
             if(returnValue == JFileChooser.APPROVE_OPTION){
                 File selectedFile = fileChooser.getSelectedFile();

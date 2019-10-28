@@ -6,6 +6,7 @@
     <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
       <Color blue="ff" green="ff" red="ff" type="rgb"/>
     </Property>
+    <Property name="undecorated" type="boolean" value="true"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
@@ -53,29 +54,44 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="lblIcono" max="32767" attributes="0"/>
+              <Group type="102" alignment="1" attributes="0">
+                  <Component id="lblEstado" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnCerrar" min="-2" pref="171" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
               <Group type="102" attributes="0">
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="lblIcono" max="32767" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lblEstudiante" alignment="0" min="-2" pref="870" max="-2" attributes="0"/>
-                          <Component id="lblCodigo" alignment="0" min="-2" pref="870" max="-2" attributes="0"/>
-                      </Group>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="lblTipo" alignment="0" min="-2" pref="870" max="-2" attributes="0"/>
+                      <Component id="lblEstudiante" alignment="0" min="-2" pref="870" max="-2" attributes="0"/>
+                      <Component id="lblCodigo" alignment="0" min="-2" pref="870" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="0" pref="1" max="32767" attributes="0"/>
               </Group>
-              <Component id="lblEstado" alignment="1" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="lblEstudiante" min="-2" pref="145" max="-2" attributes="0"/>
+                  <Component id="lblTipo" min="-2" pref="56" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="lblCodigo" min="-2" pref="89" max="-2" attributes="0"/>
+                  <Component id="lblEstudiante" min="-2" pref="76" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lblCodigo" min="-2" pref="95" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="lblIcono" min="-2" pref="139" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="lblEstado" pref="145" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="lblEstado" pref="145" max="32767" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="btnCerrar" min="-2" pref="49" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
               </Group>
           </Group>
         </DimensionLayout>
@@ -113,6 +129,24 @@
             <Property name="verticalAlignment" type="int" value="3"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JLabel" name="lblTipo">
+          <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="24" style="1"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="b1" green="37" red="e" type="rgb"/>
+            </Property>
+            <Property name="horizontalAlignment" type="int" value="0"/>
+            <Property name="text" type="java.lang.String" value="REGISTRO"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="opaque" type="boolean" value="true"/>
+            <Property name="verticalTextPosition" type="int" value="1"/>
+          </Properties>
+        </Component>
         <Component class="javax.swing.JLabel" name="lblCodigo">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -121,6 +155,14 @@
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" value="DP0024032016"/>
             <Property name="verticalAlignment" type="int" value="1"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnCerrar">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="18" style="1"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Cerrar"/>
           </Properties>
         </Component>
       </SubComponents>

@@ -22,11 +22,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
-import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -47,7 +47,6 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
     Congreso congreso;
     Integer valor, estado;
     EstudianteCongresoI ei = new EstudianteCongresoI();
-    List<EstudianteCongreso> listadoModel;
 
     public LeerCodigo(Congreso congreso, Integer valor) {
 
@@ -77,12 +76,27 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
         LimpiarPanel();
         //System.out.println(size);
 
+        btnCerrar.addActionListener(l -> {
+            Integer respuesta = JOptionPane.showConfirmDialog(null,"¿Desea cerrar el Escanner?", "Advertencia!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (respuesta == JOptionPane.OK_OPTION) {
+                if (congreso != null) {
+                    AdminCongreso ac = new AdminCongreso(congreso);
+                    ac.setLocationRelativeTo(null);
+                    this.setVisible(false);
+                    ac.setVisible(true);
+                    webcam.close();
+                    this.dispose();
+                    
+                }
+            }
+
+        });
+
         executor.execute(this);
     }
 
     void buscar(String codigo) {
-        listadoModel = ei.listadoEstudiantes.apply(congreso.getId());
-        EstudianteCongreso estudiant = listadoModel.stream().filter(p -> p.getDatosEstudiante().getCodigo().equals(codigo)).findFirst().orElse(null);
+        EstudianteCongreso estudiant = ei.obtenerEstudiantePorCodigo.apply(codigo);
         if (estudiant == null) {
             llenarPanel(null, codigo);
             estado = 3;
@@ -147,6 +161,23 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
         lblCodigo.setText("Escaneando...");
         lblEstado.setText("");
         lblCodigo.setVisible(true);
+    }
+
+    void titulo() {
+        switch (valor) {
+            case 2:
+                lblTipo.setText("REGISTRO");
+                break;
+            case 3:
+                lblTipo.setText("BREAK AM");
+                break;
+            case 4:
+                lblTipo.setText("ALMUERZO");
+                break;
+            case 5:
+                lblTipo.setText("BREAK PM");
+                break;
+        }
     }
 
     void llenarPanel(String nombre, String codigo) {
@@ -259,10 +290,13 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
         lblIcono = new javax.swing.JLabel();
         lblEstado = new javax.swing.JLabel();
         lblEstudiante = new javax.swing.JLabel();
+        lblTipo = new javax.swing.JLabel();
         lblCodigo = new javax.swing.JLabel();
+        btnCerrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
+        setUndecorated(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -288,34 +322,58 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
         lblEstudiante.setText("ANTONY DAVID DUARTE PERLERA");
         lblEstudiante.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
+        lblTipo.setBackground(new java.awt.Color(255, 255, 255));
+        lblTipo.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        lblTipo.setForeground(new java.awt.Color(14, 55, 177));
+        lblTipo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTipo.setText("REGISTRO");
+        lblTipo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblTipo.setOpaque(true);
+        lblTipo.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+
         lblCodigo.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         lblCodigo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblCodigo.setText("DP0024032016");
         lblCodigo.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
+        btnCerrar.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnCerrar.setText("Cerrar");
+
         javax.swing.GroupLayout pnlEstudianteLayout = new javax.swing.GroupLayout(pnlEstudiante);
         pnlEstudiante.setLayout(pnlEstudianteLayout);
         pnlEstudianteLayout.setHorizontalGroup(
             pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblIcono, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEstudianteLayout.createSequentialGroup()
+                .addComponent(lblEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
             .addGroup(pnlEstudianteLayout.createSequentialGroup()
-                .addGroup(pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblIcono, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(lblEstudiante, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblEstudiante, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 1, Short.MAX_VALUE))
-            .addComponent(lblEstado, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnlEstudianteLayout.setVerticalGroup(
             pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlEstudianteLayout.createSequentialGroup()
-                .addComponent(lblEstudiante, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblEstudiante, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblIcono, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblEstado, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE))
+                .addGroup(pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlEstudianteLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblEstado, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEstudianteLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -335,10 +393,10 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         AdminCongreso ac = new AdminCongreso(congreso);
-                ac.setLocationRelativeTo(null);
-                this.setVisible(false);
-                ac.setVisible(true);
-                this.dispose(); 
+        ac.setLocationRelativeTo(null);
+        this.setVisible(false);
+        ac.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_formWindowClosing
 
     /**
@@ -346,10 +404,12 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCerrar;
     private javax.swing.JLabel lblCodigo;
     private javax.swing.JLabel lblEstado;
     private javax.swing.JLabel lblEstudiante;
     private javax.swing.JLabel lblIcono;
+    private javax.swing.JLabel lblTipo;
     private javax.swing.JPanel pnlEstudiante;
     // End of variables declaration//GEN-END:variables
 }

@@ -38,6 +38,8 @@ public class AdminCongreso extends javax.swing.JFrame {
 
     void cargarLector(Integer valor) {
         new LeerCodigo(congreso, valor);
+        this.setVisible(false);
+        this.dispose();
     }
 
     public void mostrarEstudiantes() {

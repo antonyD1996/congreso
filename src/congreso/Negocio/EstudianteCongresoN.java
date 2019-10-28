@@ -6,6 +6,7 @@
 package congreso.Negocio;
 
 import congreso.Dominio.EstudianteCongreso;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -47,12 +48,13 @@ public class EstudianteCongresoN {
 
     public Function<String, EstudianteCongreso> obtenerEstudiantePorCodigo = (codigo) -> {
         LOG.log(Level.INFO, "[EstudianteCongresoN][INIT]->Obtener estudiante por codigo");
-        em.clear();
         Query query = em.createNamedQuery("EstudianteCongreso.findByCodigo").setParameter("codigo", codigo);
-        EstudianteCongreso estudiante = (EstudianteCongreso) query.getSingleResult();
-
+        Long idCongreso = (Long) query.getSingleResult();
+        EstudianteCongreso estudiante = new EstudianteCongreso();
+        estudiante.setId(idCongreso);
         if (estudiante != null) {
-            return estudiante;
+            EstudianteCongreso ec = em.find(EstudianteCongreso.class, estudiante.getId());
+            return ec;
         } else {
             return null;
         }
@@ -96,14 +98,29 @@ public class EstudianteCongresoN {
             em.close();
         }
     };
-    public Consumer<List<EstudianteCongreso>> guardarVarios = l -> {
+    public Function<List<EstudianteCongreso>, List<EstudianteCongreso>> guardarVarios = (lista) -> {
         LOG.log(Level.INFO, "[EstudianteCongresoN][INIT]->Guardar Varios");
         try {
-            em.getTransaction().begin();
-            l.stream().forEach(est -> {
-                em.persist(est);
+            List<EstudianteCongreso> listado = new ArrayList<>();
+
+            lista.stream().forEach(l -> {
+                EstudianteCongreso estudiante = obtenerEstudiantePorCodigo.apply(l.getDatosEstudiante().getCodigo());
+                if (guardarEstudiante == null) {
+                    em.getTransaction().begin();
+                    em.persist(l);
+                    em.getTransaction().commit();
+
+                } else {
+
+                    listado.add(l);
+                }
             });
-            em.getTransaction().commit();
+
+            if (listado.isEmpty()) {
+                return null;
+            } else {
+                return listado;
+            }
         } finally {
             em.close();
         }

@@ -47,8 +47,8 @@ public class EstudianteCongresoI {
     public BiConsumer<EstudianteCongreso, Integer> cambiarEstado = (e, valor) -> {
         new EstudianteCongresoN().cambiarEstado.accept(e, valor);
     };
-    public Consumer<List<EstudianteCongreso>> guardarVarios = (le) -> {
-        new EstudianteCongresoN().guardarVarios.accept(le);
+    public Function<List<EstudianteCongreso>, List<EstudianteCongreso>> guardarVarios = (le) -> {
+        return new EstudianteCongresoN().guardarVarios.apply(le);
     };
 
     public BiConsumer<JTable, List<EstudianteCongreso>> cargarTabla = (tabla, listado) -> {
@@ -80,6 +80,27 @@ public class EstudianteCongresoI {
                 evaluar(p.getBreakAM()),
                 evaluar(p.getAlmuerzo()),
                 evaluar(p.getBreakPM())
+            });
+        });
+        tabla.setModel(model);
+    };
+    public BiConsumer<JTable, List<EstudianteCongreso>> cargarTablaOmitidos = (tabla, listado) -> {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("No.");
+        model.addColumn("Codigo");
+        model.addColumn("Nombre");
+        model.addColumn("Correo");
+        model.addColumn("Carrera");
+        model.addColumn("Regional");
+
+        listado.stream().forEach(p -> {
+            model.addRow(new Object[]{
+                model.getRowCount() + 1,
+                p.getDatosEstudiante().getCodigo(),
+                p.getDatosEstudiante().getNombre(),
+                (p.getDatosEstudiante().getCodigo() + "@unab.edu.sv"),
+                p.getDatosEstudiante().getCarrera(),
+                p.getDatosEstudiante().getRegional(),
             });
         });
         tabla.setModel(model);

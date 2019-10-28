@@ -5,14 +5,24 @@
  */
 package congreso.Presentacion;
 
+import congreso.Infraestructura.EstudianteCongresoI;
+
 /**
  *
  * @author anton
  */
 public class Pruebas {
+    
+    EstudianteCongresoI ei = new EstudianteCongresoI();
+
+    public Pruebas() {
+        System.out.println(ei.obtenerEstudiantePorCodigo.apply("dp0024032016"));
+    }
+    
+    
      
     public static void main(String[] args) {
-        
+        new Pruebas();
     }
     
 }

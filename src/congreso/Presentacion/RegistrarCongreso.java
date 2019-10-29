@@ -7,6 +7,10 @@ package congreso.Presentacion;
 
 import congreso.Dominio.Congreso;
 import congreso.Negocio.CongresoN;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,31 +24,42 @@ public class RegistrarCongreso extends java.awt.Dialog {
      */
     public boolean OK = false;
     CongresoN cn = new CongresoN();
+
     public RegistrarCongreso(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         init();
     }
-    public void init(){
-        btnAceptar.addActionListener(l->{
-            if(!txtNombre.getText().trim().isEmpty()){
-            
-                Congreso c =new Congreso();
-                c.setNombre(txtNombre.getText());
-                cn.guardarCongreso.accept(c);
-                OK = true;
-                closeDialog(null);
-            }else{
+
+    public void init() {
+        
+        btnAceptar.addActionListener(l -> {
+            if (!txtNombre.getText().trim().isEmpty()) {
+                if (dtpFecha.getDate() != null) {
+                    Congreso c = new Congreso();
+                    c.setNombre(txtNombre.getText());
+                    Date date = dtpFecha.getDate();
+                    LocalDate fecha = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    c.setFecha(fecha);
+                    cn.guardarCongreso.accept(c);
+                    OK = true;
+                    setVisible(false);
+                    dispose();
+
+                } else {
+                    JOptionPane.showMessageDialog(null, "Debe seleccionar una fecha.");
+                }
+
+            } else {
                 JOptionPane.showMessageDialog(null, "Debe ingresar un nombre.");
             }
-            
+
         });
-        btnCancelar.addActionListener(l->{
+        btnCancelar.addActionListener(l -> {
             closeDialog(null);
         });
-    
+
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -62,6 +77,8 @@ public class RegistrarCongreso extends java.awt.Dialog {
         txtNombre = new javax.swing.JTextField();
         btnCancelar = new javax.swing.JButton();
         btnAceptar = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        dtpFecha = new com.toedter.calendar.JDateChooser();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -107,13 +124,23 @@ public class RegistrarCongreso extends java.awt.Dialog {
 
         btnCancelar.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btnCancelar.setText("Cancelar");
-        jPanel2.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 110, 140, 50));
+        jPanel2.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 180, 140, 50));
 
         btnAceptar.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btnAceptar.setText("Aceptar");
-        jPanel2.add(btnAceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 110, 140, 50));
+        jPanel2.add(btnAceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 180, 140, 50));
 
-        add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 580, 210));
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel3.setText("Fecha:");
+        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 90, 40));
+
+        dtpFecha.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        dtpFecha.setMinSelectableDate(Date.from(Instant.now())
+        );
+        jPanel2.add(dtpFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 80, 470, 40));
+
+        add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 580, 260));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -147,8 +174,10 @@ public class RegistrarCongreso extends java.awt.Dialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAceptar;
     private javax.swing.JButton btnCancelar;
+    private com.toedter.calendar.JDateChooser dtpFecha;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

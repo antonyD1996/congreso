@@ -12,6 +12,8 @@ import congreso.Dominio.EstudianteCongreso;
 import congreso.Infraestructura.EstudianteCongresoI;
 import congreso.Utilidades.QRGenerator;
 import congreso.Utilidades.SendEmail;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,7 +38,7 @@ public class Administrar extends javax.swing.JFrame {
     /**
      * Creates new form Administrar
      */
-    List<EstudianteCongreso> listadoModel, faltantesEmail;
+    List<EstudianteCongreso> listadoModel, faltantesEmail, lista, resultado;
     EstudianteCongresoI ei = new EstudianteCongresoI();
     Congreso congreso;
 
@@ -46,6 +49,7 @@ public class Administrar extends javax.swing.JFrame {
     }
 
     public void init() throws WriterException, IOException {
+        lista= new ArrayList<>();
         mostrarEstudiantes.accept(tblEstudiantes);
         tblEstudiantes.setFillsViewportHeight(true);
         if (listadoModel == null) {
@@ -70,6 +74,26 @@ public class Administrar extends javax.swing.JFrame {
             evaluarEmails(congreso.getId());
             mostrarEstudiantes.accept(tblEstudiantes);
         });
+        txtBuscar.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                listadoModel=ei.actualizarDatos.apply(congreso.getId(),tblEstudiantes);
+                List<EstudianteCongreso> busqueda=listadoModel.stream().filter(est->{
+                    boolean respuesta=false;
+                    if (est.getDatosEstudiante().getCodigo().toLowerCase().contains(txtBuscar.getText().toLowerCase())||
+                            est.getDatosEstudiante().getNombre().toLowerCase().contains(txtBuscar.getText().toLowerCase())||
+                            est.getDatosEstudiante().getCarrera().toLowerCase().contains(txtBuscar.getText().toLowerCase())||
+                            est.getDatosEstudiante().getRegional().toLowerCase().contains(txtBuscar.getText().toLowerCase())
+                    ){
+                        respuesta=true;
+                    }
+                    return  respuesta;
+                }).collect(Collectors.toList());
+                listadoModel = busqueda;
+                ei.mostrarCoincidencias.apply(tblEstudiantes, listadoModel);
+                
+            }
+        });
 
         btnImportar.addActionListener(l -> {
             Importar imp = new Importar(new java.awt.Frame(), true);
@@ -83,8 +107,6 @@ public class Administrar extends javax.swing.JFrame {
                     FileInputStream file = new FileInputStream(new File(imp.archivoUrl));
                     XSSFWorkbook workbook = new XSSFWorkbook(file);
                     XSSFSheet sheet = workbook.getSheetAt(0);
-
-                    List<EstudianteCongreso> lista = new ArrayList();
 
                     for (Row row : sheet) {
                         if (row.getRowNum() > 0) {
@@ -107,24 +129,26 @@ public class Administrar extends javax.swing.JFrame {
                             }
                         }
                     }
-                    if (!lista.isEmpty()) {
-                        List<EstudianteCongreso> resultado=ei.guardarVarios.apply(lista);
-                        
-                        if(!resultado.isEmpty()){
-                            JOptionPane.showMessageDialog(null, "Mientras se realizaban las importanciones se encontraron registros repetidos");
-                            RegistrosOmitidos dialog = new RegistrosOmitidos(resultado,new java.awt.Frame(), true);
-                            dialog.setLocationRelativeTo(null);
-                            dialog.setVisible(true);
+                        if (!lista.isEmpty()) {
+                             resultado= ei.guardarVarios.apply(lista);
+
+                            if (resultado!=null) {
+                                JOptionPane.showMessageDialog(null, "Mientras se realizaban las importanciones se encontraron registros repetidos");
+                                RegistrosOmitidos dialog = new RegistrosOmitidos(resultado, new java.awt.Frame(), true);
+                                dialog.setLocationRelativeTo(null);
+                                dialog.setVisible(true);
+                                resultado.clear();
+                            }
+
+                            mostrarEstudiantes.accept(tblEstudiantes);
+                            
+                        } else {
+                            JOptionPane.showMessageDialog(null, "No hay datos para procesar");
                         }
-                        
-                        mostrarEstudiantes.accept(tblEstudiantes);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "No hay datos para procesar");
-                    }
 
                     file.close();
-
-                } catch (Exception ex) {
+                    lista.clear();
+                } catch (IOException ex) {
                     Logger.getLogger(Administrar.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
@@ -177,6 +201,7 @@ public class Administrar extends javax.swing.JFrame {
         txtBuscar = new javax.swing.JTextField();
         btnRegresar = new javax.swing.JButton();
         btnEnviar = new javax.swing.JButton();
+        btnExportar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblEstudiantes = new javax.swing.JTable();
 
@@ -191,7 +216,7 @@ public class Administrar extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
         btnImportar.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        btnImportar.setText("Importar");
+        btnImportar.setText("Importar Datos");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel2.setText("Busqueda:");
@@ -201,6 +226,9 @@ public class Administrar extends javax.swing.JFrame {
 
         btnEnviar.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         btnEnviar.setText("Enviar Codigos");
+
+        btnExportar.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        btnExportar.setText("Exportar Datos");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -213,6 +241,8 @@ public class Administrar extends javax.swing.JFrame {
                 .addComponent(btnImportar, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEnviar, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnExportar, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -228,7 +258,8 @@ public class Administrar extends javax.swing.JFrame {
                     .addComponent(txtBuscar, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnRegresar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnImportar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnEnviar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnEnviar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnExportar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -256,7 +287,7 @@ public class Administrar extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1157, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1300, Short.MAX_VALUE)
             .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
@@ -305,6 +336,7 @@ public class Administrar extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEnviar;
+    private javax.swing.JButton btnExportar;
     private javax.swing.JButton btnImportar;
     private javax.swing.JButton btnRegresar;
     private javax.swing.JLabel jLabel1;
@@ -316,4 +348,5 @@ public class Administrar extends javax.swing.JFrame {
     private javax.swing.JTable tblEstudiantes;
     private javax.swing.JTextField txtBuscar;
     // End of variables declaration//GEN-END:variables
+
 }

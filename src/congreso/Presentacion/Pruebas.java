@@ -16,7 +16,7 @@ public class Pruebas {
     EstudianteCongresoI ei = new EstudianteCongresoI();
 
     public Pruebas() {
-        System.out.println(ei.obtenerEstudiantePorCodigo.apply("dp0024032016"));
+        //System.out.println(ei.obtenerEstudiantePorCodigo.apply("dp0024032016"));
     }
     
     

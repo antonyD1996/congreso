@@ -6,6 +6,7 @@
 package congreso.Infraestructura;
 import congreso.Dominio.Congreso;
 import congreso.Negocio.CongresoN;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -19,7 +20,7 @@ import javax.swing.table.TableColumn;
  *
  * @author anton
  */
-public class CongresoI {
+public class CongresoI {DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MM/yyyy");
     List<Congreso> listadoModel;
     
     CongresoN cn = new CongresoN();
@@ -34,12 +35,14 @@ public class CongresoI {
         model.addColumn("ID");
         model.addColumn("No.");
         model.addColumn("Nombre");
+        model.addColumn("fecha");
 
         listado.stream().forEach(p->{
             model.addRow(new Object[]{
                     p.getId(),
                     model.getRowCount()+1,
-                    p.getNombre()
+                    p.getNombre(),
+                    p.getFecha().format(dtf)
             });
         });
         tabla.setModel(model);

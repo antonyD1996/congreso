@@ -5,6 +5,7 @@
     <class>congreso.Dominio.Estudiante</class>
     <class>congreso.Dominio.Congreso</class>
     <class>congreso.Dominio.EstudianteCongreso</class>
+    <class>congreso.Dominio.Conversores.Conversor</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>
     <properties>

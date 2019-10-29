@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
 @SequenceGenerator(schema = "cg",sequenceName = "estudiante_congreso_id_seq",name = "Estudiante_Congreso_seq_id",allocationSize = 1)
 @NamedQueries({
         @NamedQuery(name = "EstudianteCongreso.findAll",query = "SELECT ec FROM EstudianteCongreso ec where ec.datosEstudiante.datosCongreso.id = :idCongreso"),
-        @NamedQuery(name = "EstudianteCongreso.findByCodigo",query = "SELECT ec.id FROM EstudianteCongreso ec where ec.datosEstudiante.codigo = :codigo"),
+        @NamedQuery(name = "EstudianteCongreso.findByCodigo",query = "SELECT ec.id FROM EstudianteCongreso ec where ec.datosEstudiante.codigo = :codigo and ec.datosEstudiante.datosCongreso.id = :idCongreso"),
         @NamedQuery(name = "EstudianteCongreso.EmailFaltantes",query = "SELECT ec FROM EstudianteCongreso ec where ec.datosEstudiante.datosCongreso.id =:idCongreso and ec.email=0")
         
 })

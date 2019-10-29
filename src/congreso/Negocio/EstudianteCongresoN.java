@@ -7,7 +7,9 @@ package congreso.Negocio;
 
 import congreso.Dominio.EstudianteCongreso;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -46,18 +48,19 @@ public class EstudianteCongresoN {
         return listado;
     };
 
-    public Function<String, EstudianteCongreso> obtenerEstudiantePorCodigo = (codigo) -> {
+    public Function<Map<String, Object>, EstudianteCongreso> obtenerEstudiantePorCodigo = (map) -> {
         LOG.log(Level.INFO, "[EstudianteCongresoN][INIT]->Obtener estudiante por codigo");
-        Query query = em.createNamedQuery("EstudianteCongreso.findByCodigo").setParameter("codigo", codigo);
-        Long idCongreso = (Long) query.getSingleResult();
-        EstudianteCongreso estudiante = new EstudianteCongreso();
-        estudiante.setId(idCongreso);
-        if (estudiante != null) {
-            EstudianteCongreso ec = em.find(EstudianteCongreso.class, estudiante.getId());
-            return ec;
-        } else {
+        
+        try {
+            Query query = em.createNamedQuery("EstudianteCongreso.findByCodigo").setParameter("codigo", map.get("codigo")).setParameter("idCongreso", map.get("idCongreso"));
+            EstudianteCongreso estudiante = new EstudianteCongreso();
+                estudiante.setId((Long)query.getSingleResult());
+                EstudianteCongreso ec = em.find(EstudianteCongreso.class, estudiante.getId());
+                return ec;
+        } catch (Exception e) {
             return null;
         }
+
     };
 
     public Consumer<EstudianteCongreso> guardarEstudiante = e -> {
@@ -104,8 +107,12 @@ public class EstudianteCongresoN {
             List<EstudianteCongreso> listado = new ArrayList<>();
 
             lista.stream().forEach(l -> {
-                EstudianteCongreso estudiante = obtenerEstudiantePorCodigo.apply(l.getDatosEstudiante().getCodigo());
-                if (guardarEstudiante == null) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("codigo", l.getDatosEstudiante().getCodigo());
+                map.put("idCongreso", l.getDatosEstudiante().getDatosCongreso().getId());
+                EstudianteCongreso estudiante = obtenerEstudiantePorCodigo.apply(map);
+
+                if (estudiante == null) {
                     em.getTransaction().begin();
                     em.persist(l);
                     em.getTransaction().commit();

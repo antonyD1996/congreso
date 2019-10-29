@@ -8,6 +8,7 @@ package congreso.Infraestructura;
 import congreso.Dominio.EstudianteCongreso;
 import congreso.Negocio.EstudianteCongresoN;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -37,8 +38,8 @@ public class EstudianteCongresoI {
         return en.listadoFaltantesEmail.apply(idCongreso);
     };
     
-    public Function<String, EstudianteCongreso> obtenerEstudiantePorCodigo = (codigo) -> {
-        return en.obtenerEstudiantePorCodigo.apply(codigo);
+    public Function<Map<String, Object>, EstudianteCongreso> obtenerEstudiantePorCodigo = (map) -> {
+        return en.obtenerEstudiantePorCodigo.apply(map);
     };
 
     public Consumer<EstudianteCongreso> guardarEstudiante = (e) -> {
@@ -120,6 +121,16 @@ public class EstudianteCongresoI {
     public BiFunction<Long, JTable, List<EstudianteCongreso>> actualizarDatos = (idCongreso, tabla) -> {
         listadoModel = en.listadoEstudiantes.apply(idCongreso);
         cargarTabla.accept(tabla, listadoModel);
+        TableColumn columna;
+        columna = tabla.getColumnModel().getColumn(0);
+        columna.setMaxWidth(0);
+        columna.setMinWidth(0);
+        columna.setPreferredWidth(0);
+        tabla.doLayout();
+        return listadoModel;
+    };
+    public BiFunction<JTable,List<EstudianteCongreso>,List<EstudianteCongreso>> mostrarCoincidencias = (tabla, lista) -> {
+        cargarTabla.accept(tabla, lista);
         TableColumn columna;
         columna = tabla.getColumnModel().getColumn(0);
         columna.setMaxWidth(0);

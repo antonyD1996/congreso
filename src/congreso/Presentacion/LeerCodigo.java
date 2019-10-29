@@ -22,6 +22,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -47,12 +49,14 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
     Congreso congreso;
     Integer valor, estado;
     EstudianteCongresoI ei = new EstudianteCongresoI();
+    Map<String, Object> map = new HashMap<>();
 
     public LeerCodigo(Congreso congreso, Integer valor) {
 
         initComponents();
         this.congreso = congreso;
         this.valor = valor;
+        map.put("idCongreso", congreso.getId());
         setLayout(new FlowLayout());
         setTitle("Lectura de QR");
         //setBackground(Color.WHITE);
@@ -77,7 +81,7 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
         //System.out.println(size);
 
         btnCerrar.addActionListener(l -> {
-            Integer respuesta = JOptionPane.showConfirmDialog(null,"¿Desea cerrar el Escanner?", "Advertencia!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            Integer respuesta = JOptionPane.showConfirmDialog(null, "¿Desea cerrar el Escanner?", "Advertencia!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (respuesta == JOptionPane.OK_OPTION) {
                 if (congreso != null) {
                     AdminCongreso ac = new AdminCongreso(congreso);
@@ -86,7 +90,7 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
                     ac.setVisible(true);
                     webcam.close();
                     this.dispose();
-                    
+
                 }
             }
 
@@ -96,7 +100,8 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
     }
 
     void buscar(String codigo) {
-        EstudianteCongreso estudiant = ei.obtenerEstudiantePorCodigo.apply(codigo);
+        map.put("codigo", codigo);
+        EstudianteCongreso estudiant = ei.obtenerEstudiantePorCodigo.apply(map);
         if (estudiant == null) {
             llenarPanel(null, codigo);
             estado = 3;
@@ -345,8 +350,7 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
             pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(lblIcono, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEstudianteLayout.createSequentialGroup()
-                .addComponent(lblEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
             .addGroup(pnlEstudianteLayout.createSequentialGroup()
@@ -355,6 +359,7 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
                     .addComponent(lblEstudiante, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 1, Short.MAX_VALUE))
+            .addComponent(lblEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnlEstudianteLayout.setVerticalGroup(
             pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -366,14 +371,11 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
                 .addComponent(lblCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblIcono, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(pnlEstudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlEstudianteLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblEstado, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEstudianteLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

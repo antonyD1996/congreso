@@ -5,9 +5,12 @@
  */
 package congreso.Dominio;
 
+import congreso.Dominio.Conversores.Conversor;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -36,13 +39,25 @@ public class Congreso implements Serializable {
     @NotNull
     @Column(name = "nombre")
     private String nombre;
+    @Convert (converter = Conversor.class)
+    @Column(name = "fecha")
+    private LocalDate fecha;
 
     public Congreso() {
     }
 
-    public Congreso(String nombre) {
+    public Congreso(String nombre, LocalDate fecha) {
         this.nombre = nombre;
+        this.fecha = fecha;
     }
+
+    public Congreso(Long id, String nombre, LocalDate fecha) {
+        this.id = id;
+        this.nombre = nombre;
+        this.fecha = fecha;
+    }
+
+    
 
     public Congreso(Long id, String nombre) {
         this.id = id;
@@ -64,6 +79,15 @@ public class Congreso implements Serializable {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
+    }
+    
 
     @Override
     public int hashCode() {
@@ -91,8 +115,7 @@ public class Congreso implements Serializable {
 
     @Override
     public String toString() {
-        return "Congreso{" + "id=" + id + ", nombre=" + nombre + '}';
+        return "Congreso{" + "id=" + id + ", nombre=" + nombre + ", fecha=" + fecha + '}';
     }
-    
     
 }

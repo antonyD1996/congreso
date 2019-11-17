@@ -20,8 +20,9 @@ import javax.swing.table.TableColumn;
  *
  * @author anton
  */
-public class CongresoI {DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    List<Congreso> listadoModel;
+public class CongresoI {
+    
+    DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     CongresoN cn = new CongresoN();
     
@@ -48,8 +49,7 @@ public class CongresoI {DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MM
         tabla.setModel(model);
     };
     public Function<JTable,List<Congreso>> actualizarDatos= tabla->{
-        listadoModel = cn.listadoCongresos.get();
-        cargarTabla.accept(tabla, listadoModel);
+        cargarTabla.accept(tabla, cn.listadoCongresos.get());
         TableColumn columna, n;
             columna= tabla.getColumnModel().getColumn(0);
             columna.setMaxWidth(0);
@@ -60,6 +60,6 @@ public class CongresoI {DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MM
             n.setMinWidth(100);
             n.setPreferredWidth(100);
             tabla.doLayout();
-        return listadoModel;
+        return cn.listadoCongresos.get();
     };
 }

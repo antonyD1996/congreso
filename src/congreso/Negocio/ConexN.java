@@ -22,7 +22,7 @@ public class ConexN {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("congresoPU");
         return emf.createEntityManager();
     }catch(PersistenceException|DatabaseException ex){
-        JOptionPane.showMessageDialog(null, "No hay conexion a la base de datos");
+            JOptionPane.showMessageDialog(null, "No hay conexion a la base de datos");
         System.exit(0);
     }
         return null;

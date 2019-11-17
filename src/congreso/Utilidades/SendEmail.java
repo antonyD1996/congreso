@@ -5,14 +5,15 @@
  */
 package congreso.Utilidades;
 
-import java.util.Properties;
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -25,76 +26,60 @@ import javax.mail.internet.MimeMultipart;
  * @author anton
  */
 public class SendEmail {
-    public void enviar(String codigo, String file){
 
-      // Sender's email ID needs to be mentioned
-      String from = "antony.perlera15@gmail.com";
-      
-      
-      final String username = "antony.perlera15@gmail.com";//change accordingly
-      final String password = "Andaduper2096";//change accordingly
+    public void enviar(String congreso,String correo, String nombre, String file, Session sesion) throws UnsupportedEncodingException {
 
-      // Assuming you are sending email through relay.jangosmtp.net
-      String host = "smtp.gmail.com";
+        
+        try {
 
-      Properties props = new Properties();
-      props.put("mail.smtp.auth", "true");
-      props.put("mail.smtp.starttls.enable", "true");
-      props.put("mail.smtp.host", host);
-      props.put("mail.smtp.port", "587");
+            MimeMessage crunchifyMessage = new MimeMessage(sesion);
+            crunchifyMessage.addHeader("Content-type", "text/HTML; charset=UTF-8");
+            crunchifyMessage.addHeader("format", "flowed");
+            crunchifyMessage.addHeader("Content-Transfer-Encoding", "8bit");
 
-      Session session = Session.getInstance(props,
-         new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-               return new PasswordAuthentication(username, password);
-            }
-         });
+            crunchifyMessage.setFrom(new InternetAddress("joserosalio.serrano@unab.edu.sv",
+                    "Ing. José Serrano"));
+            crunchifyMessage.setReplyTo(InternetAddress.parse("joserosalio.serrano@unab.edu.sv", true));
+            crunchifyMessage.setSubject(nombre, "UTF-8");
+            crunchifyMessage.setSentDate(new Date());
+            crunchifyMessage.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(correo, false));
 
-      try {
+            // Create the message body part
+            String body ="Estimado estudiante "+nombre+","
+                    + " descarga, haz captura o imprime la siguiente imagen para poder hacer efectiva tu participación en el "
+                    +congreso+".\n "
+                    + "<br><br>Nota importante: Este código QR es único y será con el que tendrás acceso al congreso, Break AM, Almuerzo y Break PM.\n<br><br>"
+                    + "Saludos Cordiales, <br>Ing. José Serrano";
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(body, "text/html");
 
-         // Create a default MimeMessage object.
-         Message message = new MimeMessage(session);
+            // Create a multipart message for attachment
+            Multipart multipart = new MimeMultipart();
 
-         // Set From: header field of the header.
-         message.setFrom(new InternetAddress(from));
+            // Set text message part
+            multipart.addBodyPart(messageBodyPart);
 
-         // Set To: header field of the header.
-         message.setRecipients(Message.RecipientType.TO,
-            InternetAddress.parse(codigo+"@unab.edu.sv"));
+            messageBodyPart = new MimeBodyPart();
 
-         // Set Subject: header field
-         message.setSubject("Haciendo una prueba");
+            // Valid file location
+            DataSource source = new FileDataSource(file);
+            messageBodyPart.setDataHandler(new DataHandler(source));
+            messageBodyPart.setFileName("codigo");
+            // Trick is to add the content-id header here
+            messageBodyPart.setHeader("Content-ID", "image_id");
+            multipart.addBodyPart(messageBodyPart);
+            messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent("", "text/html");
+            multipart.addBodyPart(messageBodyPart);
+            crunchifyMessage.setContent(multipart);
 
-         // This mail has 2 part, the BODY and the embedded image
-         MimeMultipart multipart = new MimeMultipart("related");
+            // Finally Send message
+            Transport.send(crunchifyMessage);
 
-         // first part (the html)
-         BodyPart messageBodyPart = new MimeBodyPart();
-         String htmlText = "<H1>Hola</H1><img src=\"cid:image\">";
-         messageBodyPart.setContent(htmlText, "text/html");
-         // add it
-         multipart.addBodyPart(messageBodyPart);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-         // second part (the image)
-         messageBodyPart = new MimeBodyPart();
-         DataSource fds = new FileDataSource(file);
-
-         messageBodyPart.setDataHandler(new DataHandler(fds));
-         messageBodyPart.setHeader("Content-ID", "<image>");
-
-         // add image to the multipart
-         multipart.addBodyPart(messageBodyPart);
-
-         // put everything together
-         message.setContent(multipart);
-         // Send message
-         Transport.send(message);
-
-         System.out.println("Sent message successfully....");
-
-      } catch (MessagingException e) {
-         throw new RuntimeException(e);
-      }
-    
     }
 }

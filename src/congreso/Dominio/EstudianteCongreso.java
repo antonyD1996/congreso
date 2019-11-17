@@ -6,7 +6,6 @@
 package congreso.Dominio;
 
 import java.io.Serializable;
-import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,59 +26,52 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(schema = "cg", name = "estudiante_congreso")
-@SequenceGenerator(schema = "cg",sequenceName = "estudiante_congreso_id_seq",name = "Estudiante_Congreso_seq_id",allocationSize = 1)
+@SequenceGenerator(schema = "cg", sequenceName = "estudiante_congreso_id_seq", name = "Estudiante_Congreso_seq_id", allocationSize = 1)
 @NamedQueries({
-        @NamedQuery(name = "EstudianteCongreso.findAll",query = "SELECT ec FROM EstudianteCongreso ec where ec.datosEstudiante.datosCongreso.id = :idCongreso"),
-        @NamedQuery(name = "EstudianteCongreso.findByCodigo",query = "SELECT ec.id FROM EstudianteCongreso ec where ec.datosEstudiante.codigo = :codigo and ec.datosEstudiante.datosCongreso.id = :idCongreso"),
-        @NamedQuery(name = "EstudianteCongreso.EmailFaltantes",query = "SELECT ec FROM EstudianteCongreso ec where ec.datosEstudiante.datosCongreso.id =:idCongreso and ec.email=0")
-        
+    @NamedQuery(name = "EstudianteCongreso.findAll", query = "SELECT ec FROM EstudianteCongreso ec where ec.datosCongreso.id = :idCongreso order by ec.datosAccion.registro DESC"),
+    @NamedQuery(name = "EstudianteCongreso.findPorRegional", query = "SELECT ec FROM EstudianteCongreso ec where ec.datosCongreso.id = :idCongreso and ec.datosEstudiante.regional = :regional order by ec.datosAccion.registro DESC"),
+    @NamedQuery(name = "EstudianteCongreso.findByUUID", query = "SELECT ec FROM EstudianteCongreso ec where ec.uuid = :uuid and ec.datosCongreso.id = :idCongreso"),
+    @NamedQuery(name = "EstudianteCongreso.findByCodigo", query = "SELECT ec FROM EstudianteCongreso ec where ec.datosEstudiante.codigo = :codigo and ec.datosCongreso.id = :idCongreso"),
+    @NamedQuery(name = "EstudianteCongreso.findEmailFaltantes", query = "SELECT ec FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.email=0"),
+    @NamedQuery(name = "EstudianteCongreso.findPendientes", query = "SELECT ec FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.abono<65"),
+    @NamedQuery(name = "EstudianteCongreso.findEmailFaltantesTotal", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.email=0"),
+    @NamedQuery(name = "EstudianteCongreso.findTotal", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso"),
+    @NamedQuery(name = "EstudianteCongreso.findRegistrados", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.registro=1"),
+    @NamedQuery(name = "EstudianteCongreso.findBreakAM", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.breakAM=1"),
+    @NamedQuery(name = "EstudianteCongreso.findAlmuerzo", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.almuerzo=1"),
+    @NamedQuery(name = "EstudianteCongreso.findBreakPM", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.breakPM=1"),
+    @NamedQuery(name = "EstudianteCongreso.findTotalPorRegional", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosEstudiante.regional=:regional"),
+    @NamedQuery(name = "EstudianteCongreso.findRegistradosPorRegional", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.registro=1 and ec.datosEstudiante.regional=:regional"),
+    @NamedQuery(name = "EstudianteCongreso.findBreakAMPorRegional", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.breakAM=1 and ec.datosEstudiante.regional=:regional"),
+    @NamedQuery(name = "EstudianteCongreso.findAlmuerzoPorRegional", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.almuerzo=1 and ec.datosEstudiante.regional=:regional"),
+    @NamedQuery(name = "EstudianteCongreso.findBreakPMPorRegional", query = "SELECT COUNT(ec.id) FROM EstudianteCongreso ec where ec.datosCongreso.id =:idCongreso and ec.datosAccion.breakPM=1 and ec.datosEstudiante.regional=:regional"),
 })
 public class EstudianteCongreso implements Serializable {
-    private static final long serialVersionUID=1L;
+
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Estudiante_seq_id")
     @Column(name = "id")
     private Long id;
     @NotNull
-    @Column(name = "registro")
-    private Integer registro;
-    @NotNull
-    @Column(name = "breakam")
-    private Integer breakAM;
-    @NotNull
-    @Column(name = "almuerzo")
-    private Integer almuerzo;
-    @NotNull
-    @Column(name = "breakpm")
-    private Integer breakPM;
-    @NotNull
-    @Column(name = "email")
-    private Integer email;
-    
-    @ManyToOne(targetEntity = Estudiante.class, cascade = CascadeType.PERSIST)
+    @Column(name = "uuid")
+    private String uuid;
+    @Column(name = "abono")
+    private Integer abono;
+
+    @ManyToOne(targetEntity = Estudiante.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "idestudiante")
     private Estudiante datosEstudiante;
 
+    @ManyToOne(targetEntity = Congreso.class)
+    @JoinColumn(name = "idcongreso")
+    private Congreso datosCongreso;
+    
+    @ManyToOne(targetEntity = Accion.class,cascade = CascadeType.ALL)
+    @JoinColumn(name = "idaccion")
+    private Accion datosAccion;
+
     public EstudianteCongreso() {
-    }
-
-    public EstudianteCongreso(Integer registro, Integer breakAM, Integer almuerzo, Integer breakPM,Integer email, Estudiante datosEstudiante) {
-        this.registro = registro;
-        this.breakAM = breakAM;
-        this.almuerzo = almuerzo;
-        this.breakPM = breakPM;
-        this.email = email;
-        this.datosEstudiante = datosEstudiante;
-    }
-
-    public EstudianteCongreso(Long id, Integer registro, Integer breakAM, Integer almuerzo, Integer breakPM, Integer email, Estudiante datosEstudiante) {
-        this.id = id;
-        this.registro = registro;
-        this.breakAM = breakAM;
-        this.almuerzo = almuerzo;
-        this.breakPM = breakPM;
-        this.email = email;
-        this.datosEstudiante = datosEstudiante;
     }
 
     public Long getId() {
@@ -90,46 +82,23 @@ public class EstudianteCongreso implements Serializable {
         this.id = id;
     }
 
-    public Integer getRegistro() {
-        return registro;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setRegistro(Integer registro) {
-        this.registro = registro;
-    }
-
-    public Integer getBreakAM() {
-        return breakAM;
-    }
-
-    public void setBreakAM(Integer breakAM) {
-        this.breakAM = breakAM;
-    }
-
-    public Integer getAlmuerzo() {
-        return almuerzo;
-    }
-
-    public void setAlmuerzo(Integer almuerzo) {
-        this.almuerzo = almuerzo;
-    }
-
-    public Integer getBreakPM() {
-        return breakPM;
-    }
-
-    public void setBreakPM(Integer breakPM) {
-        this.breakPM = breakPM;
-    }
-
-    public Integer getEmail() {
-        return email;
-    }
-
-    public void setEmail(Integer email) {
-        this.email = email;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
     
+    
+
+    public Integer getAbono() {
+        return abono;
+    }
+
+    public void setAbono(Integer abono) {
+        this.abono = abono;
+    }
 
     public Estudiante getDatosEstudiante() {
         return datosEstudiante;
@@ -139,38 +108,29 @@ public class EstudianteCongreso implements Serializable {
         this.datosEstudiante = datosEstudiante;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        return hash;
+    public Congreso getDatosCongreso() {
+        return datosCongreso;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final EstudianteCongreso other = (EstudianteCongreso) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        if (!Objects.equals(this.datosEstudiante, other.datosEstudiante)) {
-            return false;
-        }
-        return true;
+    public void setDatosCongreso(Congreso datosCongreso) {
+        this.datosCongreso = datosCongreso;
+    }
+
+    public Accion getDatosAccion() {
+        return datosAccion;
+    }
+
+    public void setDatosAccion(Accion datosAccion) {
+        this.datosAccion = datosAccion;
     }
 
     @Override
     public String toString() {
-        return "EstudianteCongreso{" + "id=" + id + ", registro=" + registro + ", breakAM=" + breakAM + ", almuerzo=" + almuerzo + ", breakPM=" + breakPM + ", email=" + email + ", datosEstudiante=" + datosEstudiante + '}';
+        return "EstudianteCongreso{" + "id=" + id + ", uuid=" + uuid + ", abono=" + abono + ", datosEstudiante=" + datosEstudiante + ", datosCongreso=" + datosCongreso + ", datosAccion=" + datosAccion + '}';
     }
 
     
-    
+
+  
+
 }

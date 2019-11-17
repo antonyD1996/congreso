@@ -17,6 +17,10 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(schema = "cg", name = "estudiantes")
 @SequenceGenerator(schema = "cg",sequenceName = "estudiantes_id_seq",name = "Estudiante_seq_id",allocationSize = 1)
+@NamedQueries({
+        @NamedQuery(name = "Estudiante.findByCodigo",query = "SELECT e FROM Estudiante e where e.codigo = :codigo")
+        
+})
 public class Estudiante implements Serializable {
      private static final long serialVersionUID=1L;
     @Id
@@ -36,28 +40,24 @@ public class Estudiante implements Serializable {
     @Column(name = "regional")
     private String regional;
     
-    @ManyToOne(targetEntity = Congreso.class)
-    @JoinColumn(name = "idcongreso")
-    private Congreso datosCongreso;
+    
 
     public Estudiante() {
     }
 
-    public Estudiante(String nombre, String codigo, String carrera, String regional, Congreso datosCongreso) {
+    public Estudiante(String nombre, String codigo, String carrera, String regional) {
         this.nombre = nombre;
         this.codigo = codigo;
         this.carrera = carrera;
         this.regional = regional;
-        this.datosCongreso = datosCongreso;
     }
 
-    public Estudiante(Long id, String nombre, String codigo, String carrera, String regional, Congreso datosCongreso) {
+    public Estudiante(Long id, String nombre, String codigo, String carrera, String regional) {
         this.id = id;
         this.nombre = nombre;
         this.codigo = codigo;
         this.carrera = carrera;
         this.regional = regional;
-        this.datosCongreso = datosCongreso;
     }
     
 
@@ -102,14 +102,6 @@ public class Estudiante implements Serializable {
     public void setRegional(String regional) {
         this.regional = regional;
     }
-
-    public Congreso getDatosCongreso() {
-        return datosCongreso;
-    }
-
-    public void setDatosCongreso(Congreso datosCongreso) {
-        this.datosCongreso = datosCongreso;
-    }
     
 
     @Override
@@ -141,7 +133,7 @@ public class Estudiante implements Serializable {
 
     @Override
     public String toString() {
-        return "Estudiante{" + "id=" + id + ", nombre=" + nombre + ", codigo=" + codigo + ", carrera=" + carrera + ", regional=" + regional + ", datosCongreso=" + datosCongreso + '}';
+        return "Estudiante{" + "id=" + id + ", nombre=" + nombre + ", codigo=" + codigo + ", carrera=" + carrera + ", regional=" + regional  + '}';
     }
 
     

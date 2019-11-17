@@ -5,11 +5,16 @@
     <class>congreso.Dominio.Estudiante</class>
     <class>congreso.Dominio.Congreso</class>
     <class>congreso.Dominio.EstudianteCongreso</class>
-    <class>congreso.Dominio.Conversores.Conversor</class>
+    <class>congreso.Dominio.Conversores.ConversorFecha</class>
+    <class>congreso.Dominio.Conversores.ConversorHora</class>
+    <class>congreso.Dominio.Accion</class>
+    <class>congreso.Dominio.Personal</class>
+    <class>congreso.Dominio.PersonalCongreso</class>
+    <class>congreso.Dominio.Tipo</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://206.189.206.157:5432/congreso"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://206.189.206.157:5432/congresosV3"/>
       <property name="javax.persistence.jdbc.user" value="postgres"/>
       <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
       <property name="javax.persistence.jdbc.password" value="congreso1234"/>

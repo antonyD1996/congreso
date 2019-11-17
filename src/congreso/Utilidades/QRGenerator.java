@@ -21,14 +21,14 @@ import java.nio.file.Path;
  */
 public class QRGenerator {
 
-    public File generateQRCodeImage(String codigo)
+    public File generateQRCodeImage(String uuid)
             throws WriterException, IOException {
-        File tempFile = File.createTempFile(codigo, "png");
+        File tempFile = File.createTempFile(uuid.toString(), ".jpg");
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(codigo, BarcodeFormat.QR_CODE, 350, 350);
+        BitMatrix bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, 350, 350);
 
         Path path = FileSystems.getDefault().getPath(tempFile.getAbsolutePath());
-        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+        MatrixToImageWriter.writeToPath(bitMatrix, "JPG", path);
         
         return tempFile;
     }

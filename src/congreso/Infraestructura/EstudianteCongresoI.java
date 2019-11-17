@@ -10,7 +10,6 @@ import congreso.Negocio.EstudianteCongresoN;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.JTable;
@@ -23,33 +22,59 @@ import javax.swing.table.TableColumn;
  */
 public class EstudianteCongresoI {
 
-    List<EstudianteCongreso> listadoModel;
-
     EstudianteCongresoN en = new EstudianteCongresoN();
 
-    public Function<Long, List<EstudianteCongreso>> listadoEstudiantes = (idCongreso) -> {
-        return en.listadoEstudiantes.apply(idCongreso);
+    public Function<Map<String, Object>, Map<String, Object>> obtenerEstadisticas = (map) -> {
+        return en.obtenerEstadisticas.apply(map);
+    };
+    public Function<Map<String, Object>, List<EstudianteCongreso>> listadoEstudiantesPaginado = (map) -> {
+        return en.listadoEstudiantesPaginado.apply(map);
+    };
+    public Function<Map<String, Object>, List<EstudianteCongreso>> listadoEstudiantesPorRegionalPaginado = (map) -> {
+        return en.listadoEstudiantesPorRegionalPaginado.apply(map);
+    };
+    public Function<Map<String, Object>, List<EstudianteCongreso>> listadoEstudiantesPorRegional = (map) -> {
+        return en.listadoEstudiantesPorRegional.apply(map);
     };
     public Function<Long, Integer> faltantesEmail = (idCongreso) -> {
         return en.faltantesEmail.apply(idCongreso);
+    };
+    public Function<Long, List<EstudianteCongreso>> listadoEstudiantes = (idCongreso) -> {
+        return en.listadoEstudiantesTodos.apply(idCongreso);
+    };
+
+    public Function<Long, List<EstudianteCongreso>> estudiantesPendietes = (idCongreso) -> {
+        return en.estudiantePendientes.apply(idCongreso);
     };
 
     public Function<Long, List<EstudianteCongreso>> listadoFaltantesEmail = (idCongreso) -> {
         return en.listadoFaltantesEmail.apply(idCongreso);
     };
-    
-    public Function<Map<String, Object>, EstudianteCongreso> obtenerEstudiantePorCodigo = (map) -> {
-        return en.obtenerEstudiantePorCodigo.apply(map);
+
+    public Function<Map<String, Object>, EstudianteCongreso> obtenerEstudiantePorUUID = (map) -> {
+        return en.obtenerEstudiantePorUUID.apply(map);
+    };
+
+    public Function<Map<String, Object>, EstudianteCongreso> obtenerEstudianteporCodigo = (map) -> {
+        return en.obtenerEstudianteCongresoPorCodigo.apply(map);
+    };
+
+    public Function<Long, EstudianteCongreso> obtenerEstudianteporID = (ID) -> {
+        return en.obtenerEstudianteCongresoPorID.apply(ID);
+    };
+
+    public Consumer<EstudianteCongreso> abonar = (e) -> {
+        new EstudianteCongresoN().abonar.accept(e);
     };
 
     public Consumer<EstudianteCongreso> guardarEstudiante = (e) -> {
         new EstudianteCongresoN().guardarEstudiante.accept(e);
     };
-    public BiConsumer<EstudianteCongreso, Integer> cambiarEstado = (e, valor) -> {
-        new EstudianteCongresoN().cambiarEstado.accept(e, valor);
+    public Consumer<EstudianteCongreso> eliminarEstudiante = (e) -> {
+        new EstudianteCongresoN().eliminarEstudiante.accept(e);
     };
-    public Function<List<EstudianteCongreso>, List<EstudianteCongreso>> guardarVarios = (le) -> {
-        return new EstudianteCongresoN().guardarVarios.apply(le);
+    public Consumer<EstudianteCongreso> cambiarEstado = (e) -> {
+        new EstudianteCongresoN().cambiarEstado.accept(e);
     };
 
     public BiConsumer<JTable, List<EstudianteCongreso>> cargarTabla = (tabla, listado) -> {
@@ -58,7 +83,6 @@ public class EstudianteCongresoI {
         model.addColumn("No.");
         model.addColumn("Codigo");
         model.addColumn("Nombre");
-        model.addColumn("Correo");
         model.addColumn("Carrera");
         model.addColumn("Regional");
         model.addColumn("Email");
@@ -66,6 +90,7 @@ public class EstudianteCongresoI {
         model.addColumn("Break AM");
         model.addColumn("Almuerzo");
         model.addColumn("Break PM");
+        model.addColumn("Abono");
 
         listado.stream().forEach(p -> {
             model.addRow(new Object[]{
@@ -73,35 +98,14 @@ public class EstudianteCongresoI {
                 model.getRowCount() + 1,
                 p.getDatosEstudiante().getCodigo(),
                 p.getDatosEstudiante().getNombre(),
-                (p.getDatosEstudiante().getCodigo() + "@unab.edu.sv"),
                 p.getDatosEstudiante().getCarrera(),
                 p.getDatosEstudiante().getRegional(),
-                evaluar(p.getEmail()),
-                evaluar(p.getRegistro()),
-                evaluar(p.getBreakAM()),
-                evaluar(p.getAlmuerzo()),
-                evaluar(p.getBreakPM())
-            });
-        });
-        tabla.setModel(model);
-    };
-    public BiConsumer<JTable, List<EstudianteCongreso>> cargarTablaOmitidos = (tabla, listado) -> {
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("No.");
-        model.addColumn("Codigo");
-        model.addColumn("Nombre");
-        model.addColumn("Correo");
-        model.addColumn("Carrera");
-        model.addColumn("Regional");
-
-        listado.stream().forEach(p -> {
-            model.addRow(new Object[]{
-                model.getRowCount() + 1,
-                p.getDatosEstudiante().getCodigo(),
-                p.getDatosEstudiante().getNombre(),
-                (p.getDatosEstudiante().getCodigo() + "@unab.edu.sv"),
-                p.getDatosEstudiante().getCarrera(),
-                p.getDatosEstudiante().getRegional(),
+                evaluar(p.getDatosAccion().getEmail()),
+                evaluar(p.getDatosAccion().getRegistro()),
+                evaluar(p.getDatosAccion().getBreakAM()),
+                evaluar(p.getDatosAccion().getAlmuerzo()),
+                evaluar(p.getDatosAccion().getBreakPM()),
+                p.getAbono()
             });
         });
         tabla.setModel(model);
@@ -118,18 +122,66 @@ public class EstudianteCongresoI {
         }
         return resultado;
     }
-    public BiFunction<Long, JTable, List<EstudianteCongreso>> actualizarDatos = (idCongreso, tabla) -> {
-        listadoModel = en.listadoEstudiantes.apply(idCongreso);
-        cargarTabla.accept(tabla, listadoModel);
-        TableColumn columna;
+
+   
+    public Consumer<Map<String, Object>> actualizarDatos = (map) -> {
+        JTable tabla = (JTable) map.get("tabla");
+        cargarTabla.accept(tabla, (List<EstudianteCongreso>) map.get("listado"));
+        TableColumn columna, numero, regional, email, breakam, almuerzo, breakpm, registro, codigo, abono;
+        int valor = 60;
         columna = tabla.getColumnModel().getColumn(0);
         columna.setMaxWidth(0);
         columna.setMinWidth(0);
         columna.setPreferredWidth(0);
+
+        numero = tabla.getColumnModel().getColumn(1);
+        numero.setMaxWidth(60);
+        numero.setMinWidth(60);
+        numero.setPreferredWidth(60);
+
+        regional = tabla.getColumnModel().getColumn(5);
+        regional.setMaxWidth(valor);
+        regional.setMinWidth(valor);
+        regional.setPreferredWidth(valor);
+
+        email = tabla.getColumnModel().getColumn(6);
+        email.setMaxWidth(valor);
+        email.setMinWidth(valor);
+        email.setPreferredWidth(valor);
+
+        registro = tabla.getColumnModel().getColumn(7);
+        registro.setMaxWidth(valor);
+        registro.setMinWidth(valor);
+        registro.setPreferredWidth(valor);
+
+        breakam = tabla.getColumnModel().getColumn(8);
+        breakam.setMaxWidth(valor + 10);
+        breakam.setMinWidth(valor + 10);
+        breakam.setPreferredWidth(valor + 10);
+
+        almuerzo = tabla.getColumnModel().getColumn(9);
+        almuerzo.setMaxWidth(valor + 10);
+        almuerzo.setMinWidth(valor + 10);
+        almuerzo.setPreferredWidth(valor + 10);
+
+        breakpm = tabla.getColumnModel().getColumn(10);
+        breakpm.setMaxWidth(valor + 10);
+        breakpm.setMinWidth(valor + 10);
+        breakpm.setPreferredWidth(valor + 10);
+
+        abono = tabla.getColumnModel().getColumn(11);
+        abono.setMaxWidth(valor + 10);
+        abono.setMinWidth(valor + 10);
+        abono.setPreferredWidth(valor + 10);
+
+        codigo = tabla.getColumnModel().getColumn(2);
+        codigo.setMaxWidth(130);
+        codigo.setMinWidth(130);
+        codigo.setPreferredWidth(130);
+
         tabla.doLayout();
-        return listadoModel;
     };
-    public BiFunction<JTable,List<EstudianteCongreso>,List<EstudianteCongreso>> mostrarCoincidencias = (tabla, lista) -> {
+    public BiConsumer<JTable, List<EstudianteCongreso>> mostrarCoincidencias = (tabla, lista) -> {
         cargarTabla.accept(tabla, lista);
         TableColumn columna;
         columna = tabla.getColumnModel().getColumn(0);
@@ -137,7 +189,6 @@ public class EstudianteCongresoI {
         columna.setMinWidth(0);
         columna.setPreferredWidth(0);
         tabla.doLayout();
-        return listadoModel;
     };
 
 }

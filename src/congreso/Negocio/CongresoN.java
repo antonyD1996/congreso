@@ -6,6 +6,7 @@
 package congreso.Negocio;
 
 import congreso.Dominio.Congreso;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -25,7 +26,7 @@ public class CongresoN {
     public Supplier<List<Congreso>> listadoCongresos = () -> {
         LOG.log(Level.INFO, "[CongresoN][INIT]->Listado de Congresos");
         em.clear();
-        Query query = em.createNamedQuery("Congreso.findAll");
+        Query query = em.createNamedQuery("Congreso.findAll").setParameter("fecha", LocalDate.now());
         List<Congreso> listado = query.getResultList();
         return listado;
     };

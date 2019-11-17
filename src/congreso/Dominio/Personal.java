@@ -5,16 +5,15 @@
  */
 package congreso.Dominio;
 
-import congreso.Dominio.Conversores.ConversorFecha;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Objects;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
@@ -26,43 +25,28 @@ import javax.validation.constraints.NotNull;
  * @author anton
  */
 @Entity
-@Table(schema = "cg", name = "congresos")
-@SequenceGenerator(schema = "cg",sequenceName = "congresos_id_seq",name = "Congreso_seq_id",allocationSize = 1)
+@Table(schema = "cg", name = "personal")
+@SequenceGenerator(schema = "cg",sequenceName = "personal_id_seq",name = "Personal_seq_id",allocationSize = 1)
 @NamedQueries({
-        @NamedQuery(name = "Congreso.findAll",query = "SELECT c FROM Congreso c where c.fecha >= :fecha order by c.fecha")
+        @NamedQuery(name = "Personal.findAll",query = "SELECT p FROM Personal p")
 })
-public class Congreso implements Serializable {
-     private static final long serialVersionUID=1L;
+public class Personal implements Serializable {
+    private static final long serialVersionUID=1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Congreso_seq_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Personal_seq_id")
     @Column(name = "id")
     private Long id;
     @NotNull
     @Column(name = "nombre")
     private String nombre;
-    @Convert (converter = ConversorFecha.class)
-    @Column(name = "fecha")
-    private LocalDate fecha;
+    @NotNull
+    @Column(name = "email")
+    private String email;
+    @ManyToOne(targetEntity = Tipo.class)
+    @JoinColumn(name = "idtipo")
+    private Tipo datosTipo;
 
-    public Congreso() {
-    }
-
-    public Congreso(String nombre, LocalDate fecha) {
-        this.nombre = nombre;
-        this.fecha = fecha;
-    }
-
-    public Congreso(Long id, String nombre, LocalDate fecha) {
-        this.id = id;
-        this.nombre = nombre;
-        this.fecha = fecha;
-    }
-
-    
-
-    public Congreso(Long id, String nombre) {
-        this.id = id;
-        this.nombre = nombre;
+    public Personal() {
     }
 
     public Long getId() {
@@ -81,18 +65,27 @@ public class Congreso implements Serializable {
         this.nombre = nombre;
     }
 
-    public LocalDate getFecha() {
-        return fecha;
+    public String getEmail() {
+        return email;
     }
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
+    public void setEmail(String email) {
+        this.email = email;
     }
-    
+
+    public Tipo getDatosTipo() {
+        return datosTipo;
+    }
+
+    public void setDatosTipo(Tipo datosTipo) {
+        this.datosTipo = datosTipo;
+    }
 
     @Override
     public int hashCode() {
         int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.id);
+        hash = 97 * hash + Objects.hashCode(this.datosTipo);
         return hash;
     }
 
@@ -107,8 +100,11 @@ public class Congreso implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Congreso other = (Congreso) obj;
+        final Personal other = (Personal) obj;
         if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.datosTipo, other.datosTipo)) {
             return false;
         }
         return true;
@@ -116,7 +112,8 @@ public class Congreso implements Serializable {
 
     @Override
     public String toString() {
-        return "Congreso{" + "id=" + id + ", nombre=" + nombre + ", fecha=" + fecha + '}';
+        return "Personal{" + "id=" + id + ", nombre=" + nombre + ", datosTipo=" + datosTipo + '}';
     }
+    
     
 }

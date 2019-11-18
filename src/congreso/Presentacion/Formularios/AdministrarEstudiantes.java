@@ -18,7 +18,8 @@ import congreso.Infraestructura.EstudianteCongresoI;
 import congreso.Presentacion.Dialogos.Abonar;
 import congreso.Presentacion.Dialogos.Importar;
 import congreso.Presentacion.Dialogos.RegistrarEstudiante;
-import congreso.Utilidades.ExportExcel;
+import congreso.Utilidades.Datos;
+import congreso.Utilidades.ExportarEstudiantes;
 import congreso.Utilidades.QRGenerator;
 import congreso.Utilidades.SendEmail;
 import java.awt.event.KeyEvent;
@@ -29,13 +30,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Row;
@@ -59,6 +56,7 @@ public class AdministrarEstudiantes extends javax.swing.JFrame {
     Map<String, Object> map = new HashMap<>();
     EstudianteCongreso estudiante = null;
     Integer pendientes;
+    Datos sesion = new Datos();
 
     public AdministrarEstudiantes(Congreso congreso) throws WriterException, IOException, Exception {
         this.congreso = congreso;
@@ -84,21 +82,7 @@ public class AdministrarEstudiantes extends javax.swing.JFrame {
         btnEnviar.addActionListener(l -> {
             faltantesEmail = ei.listadoFaltantesEmail.apply(congreso.getId());
             contador = 1;
-            Properties props = new Properties();
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-
-            String usuario = "";
-            String contra = "";
-            Authenticator authentication = new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(usuario, contra);
-                }
-            };
-            Session session = Session.getInstance(props, authentication);
+            
             boolean fallo = false;
 
             for (EstudianteCongreso fe : faltantesEmail) {
@@ -106,7 +90,7 @@ public class AdministrarEstudiantes extends javax.swing.JFrame {
                     QRGenerator qr = new QRGenerator();
                     File file = qr.generateQRCodeImage(fe.getUuid());
                     SendEmail se = new SendEmail();
-                    se.enviar(congreso.getNombre(),fe.getDatosEstudiante().getCodigo()+"@unab.edu.sv", fe.getDatosEstudiante().getNombre(), file.getAbsolutePath(), session);
+                    se.enviar(congreso.getNombre(),fe.getDatosEstudiante().getCodigo()+"@unab.edu.sv", fe.getDatosEstudiante().getNombre(), file.getAbsolutePath(), sesion.getDatosSesion());
                      accion = fe.getDatosAccion();
                     accion.setEmail(1);
                     fe.setDatosAccion(accion);
@@ -141,7 +125,7 @@ public class AdministrarEstudiantes extends javax.swing.JFrame {
                     map.put("congreso", congreso);
                     evaluarRegional(cboxRegional.getSelectedIndex());
                     map.put("listado", listaExportar);
-                    ExportExcel ex = new ExportExcel();
+                    ExportarEstudiantes ex = new ExportarEstudiantes();
                     ex.Exportar(map);
                     listaExportar.clear();
                 } catch (IOException ex1) {
@@ -755,7 +739,6 @@ public class AdministrarEstudiantes extends javax.swing.JFrame {
         if (cboxRegional.getSelectedIndex() == 0) {
             mostrarDatos();
         } else {
-
             listadoModel = ei.listadoEstudiantesPorRegionalPaginado.apply(map);
             map.put("listado", listadoModel);
             ei.actualizarDatos.accept(map);

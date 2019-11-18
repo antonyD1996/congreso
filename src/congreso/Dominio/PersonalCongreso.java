@@ -48,7 +48,7 @@ import javax.validation.constraints.NotNull;
 public class PersonalCongreso implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Estudiante_seq_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Personal_Congreso_seq_id")
     @Column(name = "id")
     private Long id;
     @NotNull

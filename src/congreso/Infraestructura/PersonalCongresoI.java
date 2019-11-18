@@ -34,18 +34,21 @@ public class PersonalCongresoI {
     public Function<Map<String, Object>, Map<String, Object>> obtenerEstadisticas = (map) -> {
         return pcn.obtenerEstadisticas.apply(map);
     };
+    public Function<Map<String, Object>, PersonalCongreso> obtenerPersonalPorUUID = (map) -> {
+        return pcn.obtenerPersonalPorUUID.apply(map);
+    };
     
     public Function<Map<String, Object>, Object> faltantesEmail = (map) -> {
         return pcn.faltantesEmail.apply(map);
     };
     public Consumer<PersonalCongreso> cambiarEstado = (p) -> {
-        pcn.cambiarEstado.accept(p);
+        new PersonalCongresoN().cambiarEstado.accept(p);
     };
      public Consumer<PersonalCongreso> guardarPersona = (p) -> {
-        pcn.guardarPersona.accept(p);
+        new PersonalCongresoN().guardarPersona.accept(p);
     };
      public Consumer<PersonalCongreso> eliminarPersona = (e) -> {
-        pcn.eliminarPersona.accept(e);
+        new PersonalCongresoN().eliminarPersona.accept(e);
     };
      
      public BiConsumer<JTable, List<PersonalCongreso>> cargarTabla = (tabla, listado) -> {
@@ -93,37 +96,42 @@ public class PersonalCongresoI {
     public Consumer<Map<String, Object>> actualizarDatos = (map) -> {
         JTable tabla = (JTable) map.get("tabla");
         cargarTabla.accept(tabla, (List<PersonalCongreso>) map.get("listado"));
-        TableColumn columna, numero, regional, email, breakam, almuerzo, breakpm, registro, codigo, abono;
+        TableColumn ID, numero, tipo, breakam, almuerzo, breakpm, registro;
         int valor = 60;
-        columna = tabla.getColumnModel().getColumn(0);
-        columna.setMaxWidth(0);
-        columna.setMinWidth(0);
-        columna.setPreferredWidth(0);
+        ID = tabla.getColumnModel().getColumn(0);
+        ID.setMaxWidth(0);
+        ID.setMinWidth(0);
+        ID.setPreferredWidth(0);
 
         numero = tabla.getColumnModel().getColumn(1);
         numero.setMaxWidth(60);
         numero.setMinWidth(60);
         numero.setPreferredWidth(60);
+        
+        tipo = tabla.getColumnModel().getColumn(4);
+        tipo.setMaxWidth(60*3-20);
+        tipo.setMinWidth(60*3-20);
+        tipo.setPreferredWidth(60*3-20);
 
-        email = tabla.getColumnModel().getColumn(5);
-        email.setMaxWidth(valor);
-        email.setMinWidth(valor);
-        email.setPreferredWidth(valor);
-
-        registro = tabla.getColumnModel().getColumn(6);
+        registro = tabla.getColumnModel().getColumn(5);
         registro.setMaxWidth(valor);
         registro.setMinWidth(valor);
         registro.setPreferredWidth(valor);
 
-        breakam = tabla.getColumnModel().getColumn(7);
+        breakam = tabla.getColumnModel().getColumn(6);
         breakam.setMaxWidth(valor + 10);
         breakam.setMinWidth(valor + 10);
         breakam.setPreferredWidth(valor + 10);
 
-        almuerzo = tabla.getColumnModel().getColumn(8);
+        almuerzo = tabla.getColumnModel().getColumn(7);
         almuerzo.setMaxWidth(valor + 10);
         almuerzo.setMinWidth(valor + 10);
         almuerzo.setPreferredWidth(valor + 10);
+        
+        breakpm = tabla.getColumnModel().getColumn(8);
+        breakpm.setMaxWidth(valor + 10);
+        breakpm.setMinWidth(valor + 10);
+        breakpm.setPreferredWidth(valor + 10);
 
         tabla.doLayout();
     };

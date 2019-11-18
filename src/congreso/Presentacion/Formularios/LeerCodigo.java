@@ -18,7 +18,9 @@ import com.google.zxing.common.HybridBinarizer;
 import congreso.Dominio.Accion;
 import congreso.Dominio.Congreso;
 import congreso.Dominio.EstudianteCongreso;
+import congreso.Dominio.PersonalCongreso;
 import congreso.Infraestructura.EstudianteCongresoI;
+import congreso.Infraestructura.PersonalCongresoI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -54,6 +56,10 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
     Congreso congreso;
     Integer valor;
     Map<String, Object> map = new HashMap<>();
+    EstudianteCongresoI ei = new EstudianteCongresoI();
+    PersonalCongresoI pci = new PersonalCongresoI();
+    EstudianteCongreso estudiant;
+    PersonalCongreso personal;
 
     int ancho = Toolkit.getDefaultToolkit().getScreenSize().width;
     Accion accion;
@@ -103,14 +109,18 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
 
     }
 
-    void buscarEstudiante(String uuid) {
-        lblCodigo.setText("Validando...");
-        EstudianteCongresoI ei = new EstudianteCongresoI();
-        map.put("uuid", uuid);
-        map.put("idCongreso", congreso.getId());
-        EstudianteCongreso estudiant = ei.obtenerEstudiantePorUUID.apply(map);
+    void buscar() {
+        if (map.get("uuid").toString().charAt(0) == 'E') {
+            buscarEstudiante();
+        } else {
+            buscarPersonal();
+        }
+    }
+
+    void buscarEstudiante() {
+        estudiant = ei.obtenerEstudiantePorUUID.apply(map);
         if (estudiant == null) {
-            llenarPanel(null, null, 3, valor, null);
+            llenarPanelEstudiante(3);
         } else {
             switch (valor) {
                 case 2: {
@@ -121,12 +131,12 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
                             accion.setHoraRegistro(LocalTime.now());
                             estudiant.setDatosAccion(accion);
                             ei.cambiarEstado.accept(estudiant);
-                            llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 1, valor, null);
+                            llenarPanelEstudiante(1);
                         } else {
-                            llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 2, valor, estudiant.getDatosAccion().getHoraRegistro());
+                            llenarPanelEstudiante(2);
                         }
                     } else {
-                        llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 2, 6, null);
+                       llenarPanelEstudiante(5);
                     }
 
                 }
@@ -140,13 +150,12 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
                             accion.setHoraBreakAM(LocalTime.now());
                             estudiant.setDatosAccion(accion);
                             ei.cambiarEstado.accept(estudiant);
-                            ei.cambiarEstado.accept(estudiant);
-                            llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 1, valor, null);
+                            llenarPanelEstudiante(1);
                         } else {
-                            llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 2, valor, estudiant.getDatosAccion().getHoraBreakAM());
+                            llenarPanelEstudiante(2);
                         }
                     } else {
-                        llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 4, valor, null);
+                        llenarPanelEstudiante(4);
                     }
 
                 }
@@ -161,13 +170,12 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
                             accion.setHoraAlmuerzo(LocalTime.now());
                             estudiant.setDatosAccion(accion);
                             ei.cambiarEstado.accept(estudiant);
-                            ei.cambiarEstado.accept(estudiant);
-                            llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 1, valor, null);
+                            llenarPanelEstudiante(1);
                         } else {
-                            llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 2, valor, estudiant.getDatosAccion().getHoraAlmuerzo());
+                            llenarPanelEstudiante(2);
                         }
                     } else {
-                        llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 4, valor, null);
+                        llenarPanelEstudiante(4);
                     }
 
                 }
@@ -182,19 +190,101 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
                             accion.setHoraBreakPM(LocalTime.now());
                             estudiant.setDatosAccion(accion);
                             ei.cambiarEstado.accept(estudiant);
-                            ei.cambiarEstado.accept(estudiant);
-                            llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 1, valor, null);
+                            llenarPanelEstudiante(1);
                         } else {
-                            llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 2, valor, estudiant.getDatosAccion().getHoraBreakPM());
+                            llenarPanelEstudiante(2);
                         }
                     } else {
-                        llenarPanel(estudiant.getDatosEstudiante().getNombre(), estudiant.getDatosEstudiante().getCodigo(), 4, valor, null);
+                        llenarPanelEstudiante(4);
                     }
 
                 }
                 break;
             }
             estudiant = null;
+        }
+    }
+
+    void buscarPersonal() {
+        personal = pci.obtenerPersonalPorUUID.apply(map);
+        if (personal == null) {
+            llenarPanelPersonal(3);
+        } else {
+            switch (valor) {
+                case 2: {
+                    if (personal.getDatosAccion().getRegistro().equals(0)) {
+                        accion = personal.getDatosAccion();
+                        accion.setRegistro(1);
+                        accion.setHoraRegistro(LocalTime.now());
+                        personal.setDatosAccion(accion);
+                        pci.cambiarEstado.accept(personal);
+                        llenarPanelPersonal(1);
+                    } else {
+                        llenarPanelPersonal(2);
+                    }
+
+                }
+                break;
+                case 3: {
+                    if (personal.getDatosAccion().getRegistro().equals(1)) {
+                        if (personal.getDatosAccion().getBreakAM() == 0) {
+                            accion = personal.getDatosAccion();
+                            accion.setBreakAM(1);
+                            accion.setHoraBreakAM(LocalTime.now());
+                            personal.setDatosAccion(accion);
+                            pci.cambiarEstado.accept(personal);
+                            llenarPanelPersonal(1);
+                        } else {
+                            llenarPanelPersonal(2);
+                        }
+                    } else {
+                        llenarPanelPersonal(4);
+                    }
+
+                }
+                break;
+
+                case 4: {
+
+                    if (personal.getDatosAccion().getRegistro().equals(1)) {
+                        if (personal.getDatosAccion().getAlmuerzo() == 0) {
+                            accion = personal.getDatosAccion();
+                            accion.setAlmuerzo(1);
+                            accion.setHoraAlmuerzo(LocalTime.now());
+                            personal.setDatosAccion(accion);
+                            pci.cambiarEstado.accept(personal);
+                            llenarPanelPersonal(1);
+                        } else {
+                            llenarPanelPersonal(2);
+                        }
+                    } else {
+                        llenarPanelPersonal(4);
+                    }
+
+                }
+                break;
+
+                case 5: {
+
+                    if (personal.getDatosAccion().getRegistro().equals(1)) {
+                        if (personal.getDatosAccion().getBreakPM() == 0) {
+                            accion = personal.getDatosAccion();
+                            accion.setBreakPM(1);
+                            accion.setHoraBreakPM(LocalTime.now());
+                            estudiant.setDatosAccion(accion);
+                            pci.cambiarEstado.accept(personal);
+                            llenarPanelPersonal(1);
+                        } else {
+                            llenarPanelPersonal(2);
+                        }
+                    } else {
+                        llenarPanelPersonal(4);
+                    }
+
+                }
+                break;
+            }
+            personal = null;
         }
     }
 
@@ -224,46 +314,42 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
         }
     }
 
-    void llenarPanel(String nombre, String codigo, Integer estado, Integer valor, LocalTime hora) {
+    void llenarPanelEstudiante(Integer estado) {
         lblIcono.setVisible(true);
         switch (estado) {
             case 1: {
                 lblCodigo.setVisible(true);
-                lblCodigo.setText(codigo.toUpperCase());
+                lblCodigo.setText(estudiant.getDatosEstudiante().getCodigo().toUpperCase());
                 lblEstudiante.setVisible(true);
-                lblEstudiante.setText(nombre);
-                lblEstado.setText("OK");
+                lblEstudiante.setText(estudiant.getDatosEstudiante().getNombre().toUpperCase());
                 lblIcono.setIcon(new ImageIcon(getClass().getResource("/congreso/img/ok.png")));
             }
             break;
             case 2: {
                 lblCodigo.setVisible(true);
-                lblCodigo.setText(codigo.toUpperCase());
+                lblCodigo.setText(estudiant.getDatosEstudiante().getCodigo().toUpperCase());
                 lblEstudiante.setVisible(true);
-                lblEstudiante.setText(nombre);
+                lblEstudiante.setText(estudiant.getDatosEstudiante().getNombre().toUpperCase());
                 switch (valor) {
                     case 2:
                         lblEstado.setText("EL ESTUDIANTE YA FUE REGISTRADO");
-                        lblHoraUsada.setText("A LAS " + convertirHora(hora));
+                        lblHoraUsada.setText("A LAS " + convertirHora(estudiant.getDatosAccion().getHoraRegistro()));
                         lblHoraUsada.setVisible(true);
                         break;
                     case 3:
                         lblEstado.setText("EL BREAK AM YA FUE TOMADO");
-                        lblHoraUsada.setText("A LAS " + convertirHora(hora));
+                        lblHoraUsada.setText("A LAS " + convertirHora(estudiant.getDatosAccion().getHoraBreakAM()));
                         lblHoraUsada.setVisible(true);
                         break;
                     case 4:
                         lblEstado.setText("EL ALMUERZO YA FUE TOMADO");
-                        lblHoraUsada.setText("A LAS " + convertirHora(hora));
+                        lblHoraUsada.setText("A LAS " + convertirHora(estudiant.getDatosAccion().getHoraAlmuerzo()));
                         lblHoraUsada.setVisible(true);
                         break;
                     case 5:
                         lblEstado.setText("EL BREAK PM YA FUE TOMADO");
-                        lblHoraUsada.setText("A LAS " + convertirHora(hora));
+                        lblHoraUsada.setText("A LAS " + convertirHora(estudiant.getDatosAccion().getHoraBreakPM()));
                         lblHoraUsada.setVisible(true);
-                        break;
-                    case 6:
-                        lblEstado.setText("PENDIENTE DE PAGO");
                         break;
                 }
 
@@ -279,10 +365,75 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
             break;
             case 4: {
                 lblCodigo.setVisible(true);
-                lblCodigo.setText(codigo.toUpperCase());
+                lblCodigo.setText(estudiant.getDatosEstudiante().getCodigo().toUpperCase());
                 lblEstudiante.setVisible(true);
-                lblEstudiante.setText(nombre);
+                lblEstudiante.setText(estudiant.getDatosEstudiante().getNombre().toUpperCase());
                 lblEstado.setText("ESTUDIANTE NO CONFIRMADO");
+                lblIcono.setIcon(new ImageIcon(getClass().getResource("/congreso/img/advertencia.png")));
+            }break;
+             case 5: {
+                lblCodigo.setVisible(true);
+                lblCodigo.setText(estudiant.getDatosEstudiante().getCodigo().toUpperCase());
+                lblEstudiante.setVisible(true);
+                lblEstudiante.setText(estudiant.getDatosEstudiante().getNombre().toUpperCase());
+                lblEstado.setText("PENDIENTE DE PAGO");
+                lblIcono.setIcon(new ImageIcon(getClass().getResource("/congreso/img/advertencia.png")));
+            }break;
+
+        }
+
+    }
+
+    void llenarPanelPersonal(Integer estado) {
+        lblIcono.setVisible(true);
+        lblCodigo.setText("");
+        switch (estado) {
+            case 1: {
+                lblEstudiante.setVisible(true);
+                lblEstudiante.setText(personal.getDatosPersonal().getNombre().toUpperCase());
+                lblIcono.setIcon(new ImageIcon(getClass().getResource("/congreso/img/ok.png")));
+            }
+            break;
+            case 2: {
+                lblEstudiante.setVisible(true);
+                lblEstudiante.setText(personal.getDatosPersonal().getNombre().toUpperCase());
+                switch (valor) {
+                    case 2:
+                        lblEstado.setText("EL REGISTRO YA FUE REALIZADO");
+                        lblHoraUsada.setText("A LAS " + convertirHora(personal.getDatosAccion().getHoraRegistro()));
+                        lblHoraUsada.setVisible(true);
+                        break;
+                    case 3:
+                        lblEstado.setText("EL BREAK AM YA FUE TOMADO");
+                        lblHoraUsada.setText("A LAS " + convertirHora(personal.getDatosAccion().getHoraBreakAM()));
+                        lblHoraUsada.setVisible(true);
+                        break;
+                    case 4:
+                        lblEstado.setText("EL ALMUERZO YA FUE TOMADO");
+                        lblHoraUsada.setText("A LAS " + convertirHora(personal.getDatosAccion().getHoraAlmuerzo()));
+                        lblHoraUsada.setVisible(true);
+                        break;
+                    case 5:
+                        lblEstado.setText("EL BREAK PM YA FUE TOMADO");
+                        lblHoraUsada.setText("A LAS " + convertirHora(personal.getDatosAccion().getHoraBreakPM()));
+                        lblHoraUsada.setVisible(true);
+                        break;
+                }
+
+                lblIcono.setIcon(new ImageIcon(getClass().getResource("/congreso/img/advertencia.png")));
+            }
+            break;
+            case 3: {
+                lblEstudiante.setVisible(false);
+                lblIcono.setIcon(new ImageIcon(getClass().getResource("/congreso/img/error.png")));
+                lblCodigo.setVisible(false);
+                lblEstado.setText("NO REGISTRADO");
+            }
+            break;
+            case 4: {
+                lblEstudiante.setVisible(true);
+                lblEstudiante.setText(personal.getDatosPersonal().getNombre().toUpperCase());
+                lblEstado.setText("NO CONFIRMADO");
                 lblIcono.setIcon(new ImageIcon(getClass().getResource("/congreso/img/advertencia.png")));
             }
 
@@ -291,16 +442,18 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
     }
 
     String convertirHora(LocalTime horaf) {
-        String h, pmam, add;
-        add = horaf.getHour()>9 ? "" : "0" ;
-        if(horaf.getHour()>12){
-            h= add+String.valueOf(horaf.getHour()-12);
-            pmam=horaf.getHour()==24? "am":"pm";
-        }else{
-            h= add+String.valueOf(horaf.getHour());
+        String t1, pmam, add, m, s;
+        add = horaf.getHour() > 9 ? "" : "0";
+        m = horaf.getMinute() > 9 ? String.valueOf(horaf.getMinute()) : "0" + horaf.getMinute();
+        s = horaf.getSecond() > 9 ? String.valueOf(horaf.getSecond()) : "0" + horaf.getSecond();
+        if (horaf.getHour() > 12) {
+            t1 = add + String.valueOf(horaf.getHour() - 12);
+            pmam = horaf.getHour() == 24 ? "am" : "pm";
+        } else {
+            t1 = add + String.valueOf(horaf.getHour());
             pmam = "am";
         }
-        return h+":"+horaf.getMinute()+":"+horaf.getSecond()+" "+pmam;
+        return t1 + ":" + m + ":" + s + " " + pmam;
     }
 
     @Override
@@ -343,7 +496,9 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
             if (result != null) {
 
                 try {
-                    buscarEstudiante(result.toString());
+                    lblCodigo.setText("Validando...");
+                    map.put("uuid", result.toString());
+                    buscar();
                     Thread.sleep(3000);
                     LimpiarPanel();
                 } catch (Exception e) {
@@ -369,9 +524,9 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
         calendario.setTime(fechaHoraActual);
         ampm = calendario.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm";
 
-        if (ampm.equals("PM")) {
+        if (ampm.equals("pm")) {
             int h = calendario.get(Calendar.HOUR_OF_DAY) - 12;
-            hora = h > 9 ? "" + h : "0" + h;
+            hora = h > 9 ? "" + h : "" + h;
         } else {
             hora = calendario.get(Calendar.HOUR_OF_DAY) > 9 ? "" + calendario.get(Calendar.HOUR_OF_DAY) : "0" + calendario.get(Calendar.HOUR_OF_DAY);
         }
@@ -523,8 +678,10 @@ public class LeerCodigo extends javax.swing.JFrame implements Runnable, ThreadFa
         AdminCongreso ac = new AdminCongreso(congreso);
         ac.setLocationRelativeTo(null);
         this.setVisible(false);
-        ac.setVisible(true);
         webcam.close();
+        this.dispose();
+        ac.setVisible(true);
+        
     }//GEN-LAST:event_formWindowClosing
 
     /**

@@ -32,11 +32,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author anton
  */
-public class ExportExcel {
+public class ExportarEstudiantes {
 
     String[] columns = {"CODIGO", "NOMBRE", "CARRERA", "REGIONAL", "ASISTIO", "BREAK AM", "ALMUERZO", "BREAK PM", "ABONO"};
-
-    String[] columns1 = {"NOMBRE", "FUNCION", "ASISTIO", "BREAK AM", "ALMUERZO", "BREAK PM"};
 
     String[] resumenes = {"Esperados", "Registrados", "Break AM", "Almuerzo", "Break PM"};
     JFileChooser SelectArchivo = new JFileChooser();
@@ -62,7 +60,7 @@ public class ExportExcel {
             archivo = SelectArchivo.getSelectedFile();
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Estudiantes");
-            sheet.protectSheet("foodEnfermeria");
+            sheet.protectSheet("food");
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
             sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 7));
             // Create a Font for styling header cells
@@ -112,25 +110,16 @@ public class ExportExcel {
 
             Row titulos = sheet.createRow(12);
 
-            if (evaluarAbono(regional)) {
                 for (int i = 0; i < columns.length; i++) {
                     Cell cell = titulos.createCell(i);
                     cell.setCellValue(columns[i]);
                     cell.setCellStyle(headerCellStyle);
                 }
-            } else {
-                for (int i = 0; i < columns1.length; i++) {
-                    Cell cell = titulos.createCell(i);
-                    cell.setCellValue(columns1[i]);
-                    cell.setCellStyle(headerCellStyle);
-                }
-            }
 
             int rowNum = 13;
             listado = (List<EstudianteCongreso>) map1.get("listado");
 
-            if (evaluarAbono(regional)) {
-                for (EstudianteCongreso estudiante : listado) {
+           for (EstudianteCongreso estudiante : listado) {
                     Row row = sheet.createRow(rowNum++);
 
                     row.createCell(0).setCellValue(estudiante.getDatosEstudiante().getCodigo());
@@ -152,33 +141,9 @@ public class ExportExcel {
                     row.createCell(8).setCellValue(estudiante.getAbono());
 
                 }
-            } else {
-                for (EstudianteCongreso estudiante : listado) {
-                    Row row = sheet.createRow(rowNum++);
-
-                    row.createCell(0).setCellValue(estudiante.getDatosEstudiante().getNombre());
-
-                    row.createCell(1).setCellValue(estudiante.getDatosEstudiante().getCarrera());
-
-                    row.createCell(2).setCellValue(evaluarEstado(estudiante.getDatosAccion().getRegistro()));
-
-                    row.createCell(3).setCellValue(evaluarEstado(estudiante.getDatosAccion().getBreakAM()));
-
-                    row.createCell(4).setCellValue(evaluarEstado(estudiante.getDatosAccion().getAlmuerzo()));
-
-                    row.createCell(5).setCellValue(evaluarEstado(estudiante.getDatosAccion().getBreakPM()));
-
-                }
-            }
-            if (evaluarAbono(regional)) {
-                for (int i = 0; i < columns.length; i++) {
+           for (int i = 0; i < columns.length; i++) {
                     sheet.autoSizeColumn(i);
                 }
-            } else {
-                for (int i = 0; i < columns1.length; i++) {
-                    sheet.autoSizeColumn(i);
-                }
-            }
 
             //Totales
             Row resumen = sheet.createRow(5);
@@ -229,11 +194,6 @@ public class ExportExcel {
         }
 
     }
-
-    Boolean evaluarAbono(String reg) {
-        return reg.equals("Todas") || reg.equals("SS") || reg.equals("SM") || reg.equals("CH") || reg.equals("SO");
-    }
-
     String evaluarEstado(Integer estado) {
         String valor;
         switch (estado) {
@@ -263,18 +223,6 @@ public class ExportExcel {
         }
         if (reg.equals("SO")) {
             regional = "Sonsonate";
-        }
-        if (reg.equals("EQ")) {
-            regional = "Equipo";
-        }
-        if (reg.equals("IE")) {
-            regional = "Invitados Especiales";
-        }
-        if (reg.equals("PO")) {
-            regional = "Ponentes";
-        }
-        if (reg.equals("DO")) {
-            regional = "Docentes";
         }
         return regional;
     }

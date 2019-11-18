@@ -127,7 +127,7 @@ public class EstudianteCongresoI {
     public Consumer<Map<String, Object>> actualizarDatos = (map) -> {
         JTable tabla = (JTable) map.get("tabla");
         cargarTabla.accept(tabla, (List<EstudianteCongreso>) map.get("listado"));
-        TableColumn columna, numero, regional, email, breakam, almuerzo, breakpm, registro, codigo, abono;
+        TableColumn columna, numero, regional, email, breakam, almuerzo, breakpm, registro, codigo, abono, carrera;
         int valor = 60;
         columna = tabla.getColumnModel().getColumn(0);
         columna.setMaxWidth(0);
@@ -138,6 +138,11 @@ public class EstudianteCongresoI {
         numero.setMaxWidth(60);
         numero.setMinWidth(60);
         numero.setPreferredWidth(60);
+        
+        carrera = tabla.getColumnModel().getColumn(4);
+        carrera.setMaxWidth(valor*3);
+        carrera.setMinWidth(valor*3);
+        carrera.setPreferredWidth(valor*3);
 
         regional = tabla.getColumnModel().getColumn(5);
         regional.setMaxWidth(valor);

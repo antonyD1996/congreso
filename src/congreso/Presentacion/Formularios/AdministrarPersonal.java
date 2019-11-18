@@ -19,6 +19,7 @@ import congreso.Infraestructura.PersonalCongresoI;
 import congreso.Infraestructura.TipoI;
 import congreso.Presentacion.Dialogos.Importar;
 import congreso.Presentacion.Dialogos.RegistrarPersonal;
+import congreso.Utilidades.Datos;
 import congreso.Utilidades.QRGenerator;
 import congreso.Utilidades.SendEmail;
 import java.io.File;
@@ -28,13 +29,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Row;
@@ -53,11 +50,13 @@ public class AdministrarPersonal extends javax.swing.JFrame {
     int contador = 1;
     List<Integer> datos;
     Map<String, Object> map = new HashMap<>();
-    PersonalCongreso persona = null;
+    PersonalCongreso persona = new PersonalCongreso();
     Integer pendientes;
     Accion accion;
+    Tipo tipo;
     List<Tipo> listadoTipos;
     TipoI ti = new TipoI();
+    Datos sesion = new Datos();
 
     public AdministrarPersonal(Congreso congreso) throws WriterException, IOException, Exception {
         this.congreso = congreso;
@@ -87,21 +86,7 @@ public class AdministrarPersonal extends javax.swing.JFrame {
             map.put("tipoEmail", 2);
             faltantesEmail = (List<PersonalCongreso>) pci.faltantesEmail.apply(map);
             contador = 1;
-            Properties props = new Properties();
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-
-            String usuario = "";
-            String contra = "";
-            Authenticator authentication = new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(usuario, contra);
-                }
-            };
-            Session session = Session.getInstance(props, authentication);
+            
             boolean fallo = false;
 
             for (PersonalCongreso pc : faltantesEmail) {
@@ -109,7 +94,7 @@ public class AdministrarPersonal extends javax.swing.JFrame {
                     QRGenerator qr = new QRGenerator();
                     File file = qr.generateQRCodeImage(pc.getUuid());
                     SendEmail se = new SendEmail();
-                    se.enviar(congreso.getNombre(), pc.getDatosPersonal().getEmail(), pc.getDatosPersonal().getNombre(), file.getAbsolutePath(), session);
+                    se.enviar(congreso.getNombre(), pc.getDatosPersonal().getEmail(), pc.getDatosPersonal().getNombre(), file.getAbsolutePath(), sesion.getDatosSesion());
                     accion = pc.getDatosAccion();
                     accion.setEmail(1);
                     pc.setDatosAccion(accion);
@@ -172,8 +157,7 @@ public class AdministrarPersonal extends javax.swing.JFrame {
                                 Accion ac = new Accion();
                                 e.setEmail(row.getCell(0).getStringCellValue().toLowerCase());
                                 e.setNombre(row.getCell(1).getStringCellValue());
-                                tipo.setId(Long.valueOf(row.getCell(2).getStringCellValue()));
-                                e.setDatosTipo(tipo);
+                                e.setDatosTipo(buscarTipo(row.getCell(2).getNumericCellValue()));
                                 PersonalCongreso ec = new PersonalCongreso();
                                 ec.setDatosPersonal(e);
                                 ec.setDatosCongreso(congreso);
@@ -237,6 +221,15 @@ public class AdministrarPersonal extends javax.swing.JFrame {
         
         }
         
+    }
+    Tipo buscarTipo(Double id){
+        
+        listadoTipos.stream().forEach(lt->{
+            if(lt.getId().doubleValue()==id){
+                tipo = lt;
+            }
+        });
+        return tipo;
     }
 
     public void evaluarEmails(Long id) {
@@ -387,7 +380,7 @@ public class AdministrarPersonal extends javax.swing.JFrame {
         panelGradient1.setLayout(panelGradient1Layout);
         panelGradient1Layout.setHorizontalGroup(
             panelGradient1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1078, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelGradient1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(panelGradient1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -458,6 +451,7 @@ public class AdministrarPersonal extends javax.swing.JFrame {
         if (cboxTipo.getSelectedIndex() == 0) {
             mostrarDatos();
         } else {
+            map.put("idTipo", (long)cboxTipo.getSelectedIndex());
             listadoModel = pci.listadoPersonalPorTipo.apply(map);
             map.put("listado", listadoModel);
             pci.actualizarDatos.accept(map);

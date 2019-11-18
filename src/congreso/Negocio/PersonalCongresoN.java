@@ -35,7 +35,7 @@ public class PersonalCongresoN {
     public Function<Map<String, Object>, List<PersonalCongreso>> listadoPersonalporTipo = (map) -> {
         LOG.log(Level.INFO, "[PersonalCongresoN][INIT]->Listado de Personal por Tipo");
         em.clear();
-        Query query = em.createNamedQuery("PersonalCongreso.findPorTipo").setParameter("idCongreso", map.get("idCongreso")).setParameter("idTipo", map.get("idTipo"));
+        Query query = em.createNamedQuery("PersonalCongreso.findPorTipo").setParameter("idCongreso", map.get("idCongreso")).setParameter("idTipo", (long)map.get("idTipo"));
         return query.getResultList();
     };
 
@@ -49,6 +49,18 @@ public class PersonalCongresoN {
             Query query = em.createNamedQuery("PersonalCongreso.findEmailFaltantes").setParameter("idCongreso", map.get("idCongreso"));
             return query.getResultList();
         }
+    };
+    public Function<Map<String, Object>, PersonalCongreso> obtenerPersonalPorUUID = (map) -> {
+        LOG.log(Level.INFO, "[PersonalCongresoN][INIT]->Obtener Personal por UUID");
+        em.clear();
+        try {
+            Query query = em.createNamedQuery("PersonalCongreso.findByUUID").setParameter("uuid", map.get("uuid")).setParameter("idCongreso", map.get("idCongreso"));
+            return  (PersonalCongreso) query.getSingleResult();
+            
+        } catch (Exception e) {
+            return null;
+        }
+
     };
     public Consumer<PersonalCongreso> cambiarEstado = (pc) -> {
         LOG.log(Level.INFO, "[PersonalCongresoN][INIT]->Cambiar Estado");

@@ -5,6 +5,7 @@ import com.google.zxing.WriterException;
 import congreso.Dominio.Congreso;
 import congreso.Infraestructura.EstudianteCongresoI;
 import congreso.Presentacion.Dialogos.Estadisticas;
+import congreso.Presentacion.Dialogos.Reportes;
 import congreso.Presentacion.Dialogos.SeleccionarCamara;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +43,12 @@ public class AdminCongreso extends javax.swing.JFrame {
             setVisible(false);
             dispose();
         });
+        btnReportes.addActionListener(l->{
+            Reportes r= new Reportes(congreso, this, true);
+            r.setLocationRelativeTo(null);
+            r.setVisible(true);
+        });
+        
         btnPersonal.addActionListener(l -> {
             try {
                 AdministrarPersonal admin = new AdministrarPersonal(congreso);
